@@ -43,15 +43,15 @@ chess-game/
 
 ### Phase 1: Core Engine
 
-- [ ] Piece base class & movement rules
+- [x] Piece base class & movement rules
 - [ ] Board class (with move validation)
-- [ ] Move class (from, to, capture)
-- [ ] GameState class (track turn, checkmate, etc.)
-- [ ] GameManager class (manages turns)
+- [x] Move class (from, to, capture)
+- [x] GameState class (track turn, checkmate, etc.)
+- [x] GameManager class (manages turns)
 
 ### Phase 2: Player Logic
 
-- [ ] Abstract Player class
+- [] Abstract Player class
 - [ ] HumanPlayer (click-based)
 - [ ] AIPlayerLLM (LLM-assisted move suggestion)
 - [ ] AIPlayerHard (trained ML model move evaluation)
