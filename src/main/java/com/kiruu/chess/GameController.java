@@ -3,7 +3,7 @@ package com.kiruu.chess;
 import com.kiruu.chess.model.Board;
 import com.kiruu.chess.model.GameManager;
 import com.kiruu.chess.model.Piece;
-import com.kiruu.chess.model.pieces.Pawn;
+import com.kiruu.chess.model.pieces.*;
 import com.kiruu.chess.player.Player;
 import com.kiruu.chess.player.types.HumanPlayer;
 import com.kiruu.chess.util.Move;
@@ -12,16 +12,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 
-import java.awt.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import java.lang.reflect.Array;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
-
+import java.awt.Color;
 public class GameController {
     private Player player;
     private GameManager gm;
     private boolean isClickedOnce = false;
     private Position firstPos, secondPos;
+    @FXML
+    private Label LABEL_TURN;
 
     @FXML
     private Button a1, b1, c1, d1, e1, f1, g1, h1,
@@ -38,11 +44,13 @@ public class GameController {
     public GameController() {
         player = new HumanPlayer("Raven", Color.WHITE);
         gm = new GameManager(player);
+        // FIX BUG LATER ===============================================
+
+        // =====================================
     }
 
     public void initialize() {
         populateButtonMatrix();
-        //initializeBoardAppearance();
         updateBoardUI();
     }
 
@@ -113,41 +121,45 @@ public class GameController {
         buttons[7][7] = h1;
     }
 
-    /*
-        private void initializeBoardAppearance() {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    if ((i + j) % 2 == 0) {
-                        buttons[i][j].setStyle("-fx-background-color: white; -fx-text-fill: black;");
-                    } else {
-                        buttons[i][j].setStyle("-fx-background-color: black; -fx-text-fill: white;");
-                    }
-                }
-            }
-        }
-    */
     public void updateBoardUI() {
         Piece[][] state = gm.getBoardState();
-        System.out.println("==============");
+
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Piece currentPiece = state[i][j];
                 if (currentPiece != null) {
-                    if (currentPiece instanceof Pawn) {
-                        //System.out.print("PAWN\t");
-                        buttons[i][j].setText(currentPiece.getColor() == Color.WHITE ? "WP" : "BP");
+                    String colorPrefix = currentPiece.getColor() == Color.WHITE ? "w" : "b";
+                    String pieceName = "";
 
-                    } else {
-                        buttons[i][j].setText(currentPiece.getClass().getSimpleName());
+                    if (currentPiece instanceof Pawn) {
+                        pieceName = "p";
+                    } else if (currentPiece instanceof Rook) {
+                        pieceName = "r";
+                    } else if (currentPiece instanceof Knight) {
+                        pieceName = "n";
+                    } else if (currentPiece instanceof Bishop) {
+                        pieceName = "b";
+                    } else if (currentPiece instanceof Queen) {
+                        pieceName = "q";
+                    } else if (currentPiece instanceof King) {
+                        pieceName = "k";
                     }
+
+                    String imagePath = "/com/kiruu/chess/img/" + colorPrefix + pieceName + ".png";
+                    Image img = new Image(getClass().getResourceAsStream(imagePath));
+                    ImageView imgView = new ImageView(img);
+                    imgView.setFitWidth(50);
+                    imgView.setFitHeight(50);
+                    buttons[i][j].setGraphic(imgView);
+                    buttons[i][j].setText(""); // Remove text in case previously set
                 } else {
+                    buttons[i][j].setGraphic(null);
                     buttons[i][j].setText("");
-                    //System.out.print("NULL\t");
                 }
             }
-            //System.out.println();
         }
     }
+
 
     public void highlightTiles(ArrayList<Position> pos) {
         for (Position p : pos) {
@@ -176,12 +188,8 @@ public class GameController {
         } else {
             secondPos = Position.getNotation(getFXID);
             boolean moveSuccessful = gm.makeMove(new Move(firstPos, secondPos));
-
-
-            System.err.println("[" + (gm.getCurrentTurn() == Color.BLACK? "BLACK" : "WHITE") + "\'S TURN]");
+            LABEL_TURN.setText((gm.getCurrentTurn() == Color.BLACK ? "BLACK" : "WHITE") + "\'S TURN");
             System.out.println("Move success: " + moveSuccessful);
-
-
             clearTiles();
             updateBoardUI();
             isClickedOnce = false;

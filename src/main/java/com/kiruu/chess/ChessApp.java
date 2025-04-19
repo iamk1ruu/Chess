@@ -13,7 +13,7 @@ public class ChessApp extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(ChessApp.class.getResource("BoardView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setResizable(false);
-        stage.setTitle("Hello!");
+        stage.setTitle("Chess");
         stage.setScene(scene);
         stage.show();
     }
