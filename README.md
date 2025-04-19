@@ -14,30 +14,6 @@ This project is a full-featured chess game built in Java using JavaFX. It includ
 
 ---
 
-## 📂 Project Structure
-
-```plaintext
-chess-game/
-│
-├── src/
-│   ├── controller/         # JavaFX Controllers (Main + Board)
-│   ├── core/               # Chess engine (pieces, board, moves)
-│   ├── players/            # Player types (Human, AI, Firebase)
-│   ├── firebase/           # Multiplayer integration
-│   ├── ai/                 # AI logic (LLM & ML based)
-│   ├── utils/              # Debugging, serialization, helpers
-│   └── assets/             # Piece models, textures, icons
-│
-├── resources/
-│   ├── fxml/               # JavaFX UI files
-│   ├── css/                # Stylesheets
-│   └── models/             # 3D models (.obj) for pieces (optional)
-│
-├── README.md
-└── pom.xml / build.gradle  # Dependencies
-```
-
----
 
 ## 🧠 Development Phases
 
