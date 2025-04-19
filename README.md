@@ -1,4 +1,7 @@
-# ♟ Chess Game Project (JavaFX + AI + Firebase)
+# ♟ Chess Game Project 
+
+## Current Development Progress
+![Sample Screenshot](about/sample_screenshot.png)
 
 ## 📌 Overview
 
