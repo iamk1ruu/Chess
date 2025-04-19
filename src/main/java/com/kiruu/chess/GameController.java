@@ -44,9 +44,6 @@ public class GameController {
     public GameController() {
         player = new HumanPlayer("Raven", Color.WHITE);
         gm = new GameManager(player);
-        // FIX BUG LATER ===============================================
-
-        // =====================================
     }
 
     public void initialize() {
@@ -162,6 +159,7 @@ public class GameController {
 
 
     public void highlightTiles(ArrayList<Position> pos) {
+
         for (Position p : pos) {
             buttons[p.getRow()][p.getCol()].setStyle(
                     "-fx-background-color: saddlebrown; " +
@@ -180,16 +178,18 @@ public class GameController {
 
     public void handleClick(ActionEvent e) {
         String getFXID = ((Node) e.getSource()).getId();
-        System.out.println("TILE CLICKED: " + getFXID);
+        System.err.println(getFXID);
         if (!isClickedOnce) {
             firstPos = Position.getNotation(getFXID);
+            if (gm.getPiece(firstPos).getColor() != gm.getCurrentTurn())
+                return;
             highlightTiles(gm.getPossibleMoves(getFXID));
             isClickedOnce = true;
         } else {
             secondPos = Position.getNotation(getFXID);
             boolean moveSuccessful = gm.makeMove(new Move(firstPos, secondPos));
             LABEL_TURN.setText((gm.getCurrentTurn() == Color.BLACK ? "BLACK" : "WHITE") + "\'S TURN");
-            System.out.println("Move success: " + moveSuccessful);
+            System.out.println("[GAME] Move success: " + moveSuccessful);
             clearTiles();
             updateBoardUI();
             isClickedOnce = false;

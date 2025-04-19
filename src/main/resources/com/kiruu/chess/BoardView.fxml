@@ -125,7 +125,7 @@
             <Font name="Artifakt Element Book Italic" size="26.0" />
          </font>
       </Label>
-      <Label fx:id="LABEL_TURN" alignment="CENTER" layoutX="256.0" layoutY="684.0" prefHeight="62.0" prefWidth="494.0" text=" " wrapText="true">
+      <Label fx:id="LABEL_TURN" alignment="CENTER" layoutX="256.0" layoutY="684.0" prefHeight="62.0" prefWidth="494.0" text="WHITE'S TURN" wrapText="true">
          <font>
             <Font name="Artifakt Element Book Italic" size="26.0" />
          </font>

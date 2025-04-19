@@ -48,5 +48,7 @@ public class GameManager {
         Position pos = Position.getNotation(fxid);
         return board.validMoves(pos);
     }
-
+    public Piece getPiece(Position pos) {
+        return board.getPiece(pos);
+    }
 }
