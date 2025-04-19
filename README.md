@@ -45,13 +45,13 @@ chess-game/
 
 - [x] Piece base class & movement rules
 - [ ] Board class (with move validation)
-- [x] Move class (from, to, capture)
-- [x] GameState class (track turn, checkmate, etc.)
+- [x] Move class (from, to, capture)\
+- [x] Position class
 - [x] GameManager class (manages turns)
 
 ### Phase 2: Player Logic
 
-- [] Abstract Player class
+- [x] Abstract Player class
 - [ ] HumanPlayer (click-based)
 - [ ] AIPlayerLLM (LLM-assisted move suggestion)
 - [ ] AIPlayerHard (trained ML model move evaluation)
