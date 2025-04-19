@@ -1,4 +1,4 @@
-# ♟ Chess Game Project 
+# ♟ Chess Game Project (ONGOING)
 
 ## Current Development Progress
 * Created visual board and move highlighter
@@ -8,7 +8,7 @@
 
 ## 📌 Overview
 
-This project is a full-featured chess game built in Java using JavaFX. It includes:
+This project is a full-featured chess game built in Java using JavaFX. It will include:
 
 - A complete chess engine with all standard rules
 - Multiple player types: Human, AI (easy via LLM, hard via trained ML), and Online
