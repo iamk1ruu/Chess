@@ -1,6 +1,9 @@
 # ♟ Chess Game Project 
 
 ## Current Development Progress
+* Created visual board and move highlighter
+* Create the base classes for fundamental game logic
+* Added Pawn behavior
 ![Sample Screenshot](about/sample_screenshot.png)
 
 ## 📌 Overview
