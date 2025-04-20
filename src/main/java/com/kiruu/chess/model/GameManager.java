@@ -12,6 +12,17 @@ public class GameManager {
     private final Player whitePlayer;
     private final Player blackPlayer;
     private final Board board;
+    private int state = -1;
+    private boolean gameOver = false;
+    private Color winner = null;
+    // State constants
+    public static final int NO_SPECIAL_STATE = -1;
+    public static final int WHITE_PROMOTION = 1;
+    public static final int BLACK_PROMOTION = 2;
+    public static final int WHITE_IN_CHECK = 3;
+    public static final int BLACK_IN_CHECK = 4;
+    public static final int WHITE_CHECKMATE = 5;
+    public static final int BLACK_CHECKMATE = 6;
 
     public GameManager(Player player1, Player player2) {
         if (player1.getColor() == Color.WHITE) {
@@ -46,8 +57,15 @@ public class GameManager {
 
         if (board.validateMove(move)) {
             board.move(move);
-            switchTurn();
-            System.out.println("[DEBUG] Switched Turn");
+            state = board.checkState(move);
+
+            // Only switch turn if promotion isn't happening
+            if (state != WHITE_PROMOTION && state != BLACK_PROMOTION) {
+                switchTurn();
+                System.out.println("[DEBUG] Switched Turn");
+            } else {
+                System.out.println("[DEBUG] Promotion pending, turn not switched yet");
+            }
             return true;
         }
 
@@ -67,6 +85,20 @@ public class GameManager {
         return currentTurn;
     }
 
+    public void promotePawn(Position position, Piece promotedPiece) {
+        Piece[][] boardState = board.getBoardState();
+        boardState[position.getRow()][position.getCol()] = promotedPiece;
+
+        switchTurn();
+        System.out.println("[DEBUG] Pawn promoted and turn switched");
+
+        state = NO_SPECIAL_STATE;
+    }
+
+    public int getState() {
+        return state;
+    }
+
     public ArrayList<Position> getPossibleMoves(String fxid) {
         return board.validMoves(Position.getNotation(fxid));
     }
@@ -75,4 +107,18 @@ public class GameManager {
         return board.getPiece(pos);
     }
 
+    public Board getBoard() {
+        return board;
+    }
+    public boolean isGameOver() {
+        return gameOver;
+    }
+    public Color getWinner() {
+        return winner;
+    }
+    public void setGameOver(Color winner) {
+        System.err.println("[GAME] " + (Color.black == winner ? "BLACK" : "WHITE" )+ " Wins!");
+        gameOver = true;
+        this.winner = winner;
+    }
 }

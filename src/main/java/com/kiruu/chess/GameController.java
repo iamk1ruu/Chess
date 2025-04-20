@@ -15,6 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+
 import java.util.ArrayList;
 import java.awt.Color;
 import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.EASY;
@@ -25,10 +28,22 @@ public class GameController {
     private GameManager gm;
     private boolean isClickedOnce = false;
     private Position firstPos, secondPos;
+    private Position promotionPosition;
     private int GAMEMODE; // -1 for 2 players, 0 for AI, and 1 for Multiplayer
+
     @FXML
     private Label LABEL_TURN;
 
+    @FXML
+    private AnchorPane promotionPane;
+
+    @FXML
+    private ImageView IMAGE_BOARD;
+
+    @FXML
+    private Button queenButton, rookButton, knightButton, bishopButton;
+    @FXML
+    private GridPane GRID_CONTAINER;
     @FXML
     private Button a1, b1, c1, d1, e1, f1, g1, h1,
             a2, b2, c2, d2, e2, f2, g2, h2,
@@ -55,10 +70,59 @@ public class GameController {
                 break;
         }
         gm = new GameManager(player, opponent);
+
     }
+
     public void initialize() {
         populateButtonMatrix();
         updateBoardUI();
+        updateTurnLabel();
+
+        // Initialize promotion pane
+        if (promotionPane != null) {
+            promotionPane.setVisible(false);
+            IMAGE_BOARD.setVisible(true);
+            GRID_CONTAINER.setVisible(true);
+            // Map the promotion buttons
+            for (Node node : promotionPane.getChildren()) {
+                if (node instanceof Button) {
+                    Button button = (Button) node;
+                    if (button.getGraphic() instanceof ImageView) {
+                        ImageView iv = (ImageView) button.getGraphic();
+                        if (iv.getImage() != null) {
+                            String url = iv.getImage().getUrl();
+                            if (url.contains("wq.png")) {
+                                queenButton = button;
+                            } else if (url.contains("wr.png")) {
+                                rookButton = button;
+                            } else if (url.contains("wn.png")) {
+                                knightButton = button;
+                            } else if (url.contains("wb.png")) {
+                                bishopButton = button;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Set up promotion button event handlers
+            setupPromotionHandlers();
+        }
+    }
+
+    private void setupPromotionHandlers() {
+        if (queenButton != null) {
+            queenButton.setOnAction(e -> handlePromotionSelection("queen"));
+        }
+        if (rookButton != null) {
+            rookButton.setOnAction(e -> handlePromotionSelection("rook"));
+        }
+        if (knightButton != null) {
+            knightButton.setOnAction(e -> handlePromotionSelection("knight"));
+        }
+        if (bishopButton != null) {
+            bishopButton.setOnAction(e -> handlePromotionSelection("bishop"));
+        }
     }
 
     public void populateButtonMatrix() {
@@ -131,7 +195,8 @@ public class GameController {
     public void updateBoardUI() {
         Piece[][] state = gm.getBoardState();
         clearTiles();
-
+        IMAGE_BOARD.setVisible(true);
+        GRID_CONTAINER.setVisible(true);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Piece currentPiece = state[i][j];
@@ -166,6 +231,15 @@ public class GameController {
                 }
             }
         }
+
+        updateTurnLabel();
+    }
+
+    private void updateTurnLabel() {
+        if (LABEL_TURN != null) {
+            String turnText = (gm.getCurrentTurn() == Color.WHITE) ? "White's Turn" : "Black's Turn";
+            LABEL_TURN.setText(turnText);
+        }
     }
 
     // === FIX THE BUTTON SIZE TO AVOID MISCLICKS
@@ -191,6 +265,11 @@ public class GameController {
     }
 
     public void handleClick(ActionEvent e) {
+        // If promotion pane is visible, ignore board clicks
+        if (promotionPane != null && promotionPane.isVisible()) {
+            return;
+        }
+
         String getFXID = ((Node) e.getSource()).getId();
 
         switch (GAMEMODE) {
@@ -208,7 +287,30 @@ public class GameController {
                 } else {
                     secondPos = Position.getNotation(getFXID);
                     Player current = gm.getCurrentTurn() == player.getColor() ? player : opponent;
-                    gm.makeMove(new Move(firstPos, secondPos), current);
+
+                    boolean moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
+
+                    if (moveMade) {
+                        // Check if promotion is needed
+                        int state = gm.getState();
+
+                        if (state == GameManager.WHITE_PROMOTION || state == GameManager.BLACK_PROMOTION) {
+                            Color promotionColor = (state == GameManager.WHITE_PROMOTION) ? Color.WHITE : Color.BLACK;
+                            promotionPosition = secondPos;
+                            showPromotionPane(promotionColor);
+                        }
+                        if (state == GameManager.WHITE_IN_CHECK || state == GameManager.BLACK_IN_CHECK) {
+                            System.err.println("[DEBUG] King is in check.");
+                        }
+                        if (state == GameManager.WHITE_CHECKMATE || state == GameManager.BLACK_CHECKMATE) {
+                            Color winner = state == GameManager.WHITE_CHECKMATE ? Color.BLACK : Color.WHITE;
+                            System.err.println("[DEBUG] " + (state == 5 ? "White" : "Black") + "\'s King Checkmated");
+                            gm.setGameOver(winner);
+                            gameOver(winner);
+                        }
+
+                    }
+
                     updateBoardUI();
                     isClickedOnce = false;
                 }
@@ -218,6 +320,72 @@ public class GameController {
                 if (player != gm.getCurrentPlayer())
                     return;
         }
+    }
 
+    private void showPromotionPane(Color color) {
+        if (promotionPane != null) {
+            // Update promotion pane images based on the color
+            updatePromotionPieceImages(color);
+
+            // Show the promotion pane
+            promotionPane.setVisible(true);
+        } else {
+            System.err.println("Promotion pane not found in FXML!");
+        }
+    }
+    public void gameOver(Color winner) {
+        GRID_CONTAINER.setDisable(true);
+        LABEL_TURN.setVisible(false);
+    }
+
+    private void updatePromotionPieceImages(Color color) {
+        String colorPrefix = color == Color.WHITE ? "w" : "b";
+
+        // Update each button image with the correct color
+        if (queenButton != null && queenButton.getGraphic() instanceof ImageView) {
+            String imagePath = "/com/kiruu/chess/img/" + colorPrefix + "q.png";
+            ((ImageView) queenButton.getGraphic()).setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        }
+
+        if (rookButton != null && rookButton.getGraphic() instanceof ImageView) {
+            String imagePath = "/com/kiruu/chess/img/" + colorPrefix + "r.png";
+            ((ImageView) rookButton.getGraphic()).setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        }
+
+        if (knightButton != null && knightButton.getGraphic() instanceof ImageView) {
+            String imagePath = "/com/kiruu/chess/img/" + colorPrefix + "n.png";
+            ((ImageView) knightButton.getGraphic()).setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        }
+
+        if (bishopButton != null && bishopButton.getGraphic() instanceof ImageView) {
+            String imagePath = "/com/kiruu/chess/img/" + colorPrefix + "b.png";
+            ((ImageView) bishopButton.getGraphic()).setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        }
+    }
+
+    private void handlePromotionSelection(String pieceType) {
+        Color currentColor = gm.getCurrentTurn();
+        Piece promotedPiece = null;
+
+        switch (pieceType) {
+            case "queen":
+                promotedPiece = new Queen(currentColor);
+                break;
+            case "rook":
+                promotedPiece = new Rook(currentColor);
+                break;
+            case "knight":
+                promotedPiece = new Knight(currentColor);
+                break;
+            case "bishop":
+                promotedPiece = new Bishop(currentColor);
+                break;
+        }
+
+        if (promotedPiece != null && promotionPosition != null) {
+            gm.promotePawn(promotionPosition, promotedPiece);
+            promotionPane.setVisible(false);
+            updateBoardUI();
+        }
     }
 }

@@ -12,12 +12,17 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kiruu.chess.GameController">
     <children>
-        <ImageView fitHeight="549.0" fitWidth="563.0" layoutX="227.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true">
+      <Label fx:id="LABEL_TURN" alignment="CENTER" layoutX="256.0" layoutY="684.0" prefHeight="62.0" prefWidth="494.0" text="WHITE'S TURN" wrapText="true">
+         <font>
+            <Font name="Artifakt Element Book Italic" size="26.0" />
+         </font>
+      </Label>
+        <ImageView fx:id="IMAGE_BOARD" fitHeight="549.0" fitWidth="563.0" layoutX="227.0" layoutY="125.0" pickOnBounds="true" preserveRatio="true" visible="false">
             <image>
                 <Image url="@img/board.jpeg" />
             </image>
         </ImageView>
-        <GridPane layoutX="253.0" layoutY="148.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" style="-fx-border-color: black;">
+        <GridPane fx:id="GRID_CONTAINER" layoutX="253.0" layoutY="148.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" style="-fx-border-color: black;" visible="false">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -125,10 +130,50 @@
             <Font name="Artifakt Element Book Italic" size="26.0" />
          </font>
       </Label>
-      <Label fx:id="LABEL_TURN" alignment="CENTER" layoutX="256.0" layoutY="684.0" prefHeight="62.0" prefWidth="494.0" text="WHITE'S TURN" wrapText="true">
-         <font>
-            <Font name="Artifakt Element Book Italic" size="26.0" />
-         </font>
-      </Label>
+      <AnchorPane fx:id="promotionPane" layoutX="256.0" layoutY="193.0" prefHeight="358.0" prefWidth="455.0" style="-fx-background-color: tan;">
+         <children>
+            <Label fx:id="LABEL_TURN1" alignment="CENTER" layoutY="14.0" prefHeight="62.0" prefWidth="494.0" text="Select a piece to transform to" wrapText="true">
+               <font>
+                  <Font name="Ebrima" size="26.0" />
+               </font>
+            </Label>
+            <Button fx:id="queenButton" layoutX="99.0" layoutY="91.0" mnemonicParsing="false" prefHeight="91.0" prefWidth="97.0" style="-fx-background-color: saddlebrown; -fx-effect: dropshadow(gaussian, rgba(244, 164, 96, 0.75), 30, 0.6, 0, 0);">
+               <graphic>
+                  <ImageView fitHeight="55.0" fitWidth="111.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/wq.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="knightButton" layoutX="99.0" layoutY="218.0" mnemonicParsing="false" prefHeight="91.0" prefWidth="97.0" style="-fx-background-color: saddlebrown; -fx-effect: dropshadow(gaussian, rgba(244, 164, 96, 0.75), 30, 0.6, 0, 0);">
+               <graphic>
+                  <ImageView fitHeight="55.0" fitWidth="111.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/wn.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="rookButton" layoutX="274.0" layoutY="91.0" mnemonicParsing="false" prefHeight="91.0" prefWidth="97.0" style="-fx-background-color: saddlebrown; -fx-effect: dropshadow(gaussian, rgba(244, 164, 96, 0.75), 30, 0.6, 0, 0);">
+               <graphic>
+                  <ImageView fitHeight="55.0" fitWidth="111.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/wr.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="bishopButton" layoutX="274.0" layoutY="218.0" mnemonicParsing="false" prefHeight="91.0" prefWidth="97.0" style="-fx-background-color: saddlebrown; -fx-effect: dropshadow(gaussian, rgba(244, 164, 96, 0.75), 30, 0.6, 0, 0);">
+               <graphic>
+                  <ImageView fitHeight="55.0" fitWidth="111.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@img/wb.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </AnchorPane>
     </children>
 </AnchorPane>
