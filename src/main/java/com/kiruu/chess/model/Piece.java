@@ -9,5 +9,4 @@ public abstract class Piece {
     public Piece(Color color) {this.color = color;}
     public Color getColor() {return color;}
     public abstract String getSymbol();
-    public abstract ArrayList<Position> getValidMoves(Board board, Position from);
 }

@@ -6,11 +6,10 @@ import com.kiruu.chess.util.Position;
 
 import java.awt.*;
 import java.util.ArrayList;
-
 public class Board {
     private Piece[][] board = new Piece[8][8];
     private ArrayList<Position> doubleForwardPawns = new ArrayList<>();
-    public boolean isInBounds(int row, int col) {
+    private boolean isInBounds(int row, int col) {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
     }
     public void initializeBoard() {
@@ -30,10 +29,49 @@ public class Board {
 
     public ArrayList<Position> validMoves(Position from) {
         ArrayList<Position> possibleMoves = new ArrayList<>();
-        Piece piece = board[from.getRow()][from.getCol()];
-        if (piece != null) {
-            possibleMoves = piece.getValidMoves(this, from);
-        } else {
+        Piece getPiece = board[from.getRow()][from.getCol()];
+        try {
+            Color color = getPiece.getColor();
+            if (getPiece instanceof Pawn) {
+                int dir = (color == Color.WHITE) ? -1 : 1;
+                int startRow = (color == Color.WHITE) ? 6 : 1;
+                int oneStepRow = from.getRow() + dir;
+                int ldCol = (color == Color.WHITE) ? -1 : 1;
+                int rdCol = (color == Color.WHITE) ? 1 : -1;
+                // Normal forward position
+                if (isInBounds(oneStepRow, from.getCol()) && board[oneStepRow][from.getCol()] == null) {
+                    possibleMoves.add(new Position(oneStepRow, from.getCol()));
+                    int twoStepRow = from.getRow() + (2 * dir);
+                    if (from.getRow() == startRow && board[twoStepRow][from.getCol()] == null) {
+                        possibleMoves.add(new Position(twoStepRow, from.getCol()));
+                    }
+                }
+                // Capture left diagonal
+                if (isInBounds(oneStepRow, from.getCol() + ldCol) && board[oneStepRow][from.getCol() + ldCol] != null
+                        && board[oneStepRow][from.getCol() + ldCol].getColor() != getPiece.getColor()) {
+                    possibleMoves.add(new Position(oneStepRow, from.getCol() + ldCol));
+                }
+                // Capture right diagonal
+                if (isInBounds(oneStepRow, from.getCol() + rdCol) && board[oneStepRow][from.getCol() + rdCol] != null
+                        && board[oneStepRow][from.getCol() + rdCol].getColor() != getPiece.getColor()) {
+                    possibleMoves.add(new Position(oneStepRow, from.getCol() + rdCol));
+                }
+
+                // Check for en passant captures
+                int[] adjacentCols = {from.getCol() - 1, from.getCol() + 1};
+                for (int adjCol : adjacentCols) {
+                    if (isInBounds(from.getRow(), adjCol)) {
+                        Piece adjacentPiece = board[from.getRow()][adjCol];
+                        if (adjacentPiece instanceof Pawn && adjacentPiece.getColor() != color) {
+                            Position adjacentPos = new Position(from.getRow(), adjCol);
+                            if (doubleForwardPawns.contains(adjacentPos)) {
+                                possibleMoves.add(new Position(from.getRow() + dir, adjCol));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (NullPointerException e) {
             System.err.println("[GAME] Selected an empty tile.");
         }
         return possibleMoves;
@@ -106,13 +144,4 @@ public class Board {
         // For checkmate, if the king has no possible moves anymore or validMoves().isEmpty(), then we can conclude
         // a checkmate is happened.
     }
-
-    public Piece getPiece(int row, int col) {
-        return board[row][col];
-    }
-
-    public ArrayList<Position> getDoubleForwardPawns() {
-        return doubleForwardPawns;
-    }
-
 }

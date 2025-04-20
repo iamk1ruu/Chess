@@ -45,10 +45,14 @@ public class GameManager {
     }
     // !! May be redundant.
     public ArrayList<Position> getPossibleMoves(String fxid) {
-        Position pos = Position.getNotation(fxid);
-        return board.validMoves(pos);
+        return board.validMoves(Position.getNotation(fxid));
     }
     public Piece getPiece(Position pos) {
         return board.getPiece(pos);
     }
 }
+
+/*
+        NOTE:
+        1. Check for redundancy for methods that return ArrayList<Position>.
+ */
