@@ -6,6 +6,7 @@ import com.kiruu.chess.util.Position;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Board {
     private Piece[][] board = new Piece[8][8];
@@ -223,8 +224,6 @@ public class Board {
         for (Position pos : possibleMoves) {
             char col = (char) ('a' + pos.getCol());
             int row = 8 - pos.getRow();
-            System.out.println(String.format("[GAME] Valid Move: %c%d", col, row));
-
             if (Position.equals(move.getTo(), pos))
                 return true;
         }
@@ -300,17 +299,29 @@ public class Board {
             System.err.println("Clicked on an empty tile.");
         }
     }
-
+    // ========== Will make a GUI for this later
+    public Piece promote(Color color) {
+        Scanner sc = new Scanner(System.in);
+        System.err.println("[PROMOTION] Enter the piece you want the pawn to transform into: ");
+        String piece = sc.nextLine();
+        return switch (piece) {
+            case "Rook" -> new Rook(color);
+            case "Knight" -> new Knight(color);
+            case "Bishop" -> new Bishop(color);
+            case "Queen" -> new Queen(color);
+            default -> null;
+        };
+    }
     public void checkState(Move move) {
         if (move.getTo().getRow() == 0
                 && board[move.getTo().getRow()][move.getTo().getCol()] instanceof Pawn
                 && board[move.getTo().getRow()][move.getTo().getCol()].getColor() == Color.WHITE) {
-            System.err.println("[GAME] Promotion Possible");
+            board[move.getTo().getRow()][move.getTo().getCol()] = promote(board[move.getTo().getRow()][move.getTo().getCol()].getColor());
         }
         if (move.getTo().getRow() == 7
                 && board[move.getTo().getRow()][move.getTo().getCol()] instanceof Pawn
                 && board[move.getTo().getRow()][move.getTo().getCol()].getColor() == Color.BLACK) {
-            System.err.println("[GAME]: Promotion Possible");
+            board[move.getTo().getRow()][move.getTo().getCol()] = promote(board[move.getTo().getRow()][move.getTo().getCol()].getColor());
         }
     }
 }

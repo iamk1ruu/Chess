@@ -1,6 +1,5 @@
 package com.kiruu.chess;
 
-import com.kiruu.chess.model.Board;
 import com.kiruu.chess.model.GameManager;
 import com.kiruu.chess.model.Piece;
 import com.kiruu.chess.model.pieces.*;
@@ -15,14 +14,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import java.lang.reflect.Array;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.awt.Color;
-
+import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.EASY;
 import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.HARD;
 
 public class GameController {
@@ -135,6 +130,7 @@ public class GameController {
 
     public void updateBoardUI() {
         Piece[][] state = gm.getBoardState();
+        clearTiles();
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -212,10 +208,7 @@ public class GameController {
                 } else {
                     secondPos = Position.getNotation(getFXID);
                     Player current = gm.getCurrentTurn() == player.getColor() ? player : opponent;
-                    boolean moveSuccessful = gm.makeMove(new Move(firstPos, secondPos), current);
-                    LABEL_TURN.setText((gm.getCurrentTurn() == Color.BLACK ? "BLACK" : "WHITE") + "\'S TURN");
-                    System.out.println("[GAME] Move success: " + moveSuccessful);
-                    clearTiles();
+                    gm.makeMove(new Move(firstPos, secondPos), current);
                     updateBoardUI();
                     isClickedOnce = false;
                 }

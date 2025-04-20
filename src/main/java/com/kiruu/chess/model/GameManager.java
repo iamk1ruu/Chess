@@ -47,7 +47,7 @@ public class GameManager {
         if (board.validateMove(move)) {
             board.move(move);
             switchTurn();
-            System.err.println("[DEBUG] Switched Turn");
+            System.out.println("[DEBUG] Switched Turn");
             return true;
         }
 
@@ -74,4 +74,5 @@ public class GameManager {
     public Piece getPiece(Position pos) {
         return board.getPiece(pos);
     }
+
 }
