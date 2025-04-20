@@ -8,6 +8,7 @@
 ### April 20
 * Added other pieces' behavior
 * Added En Passant and Castling
+* Added Promotion logic with GUI
 * Added temporary turn-checking failsafes
 * Added Check, and Checkmate
 * Added temporary Game Over functions
