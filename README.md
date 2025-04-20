@@ -9,6 +9,8 @@
 * Added other pieces' behavior
 * Added En Passant and Castling
 * Added temporary turn-checking failsafes
+* Added Check, and Checkmate
+* Added temporary Game Over functions
 ![Sample Screenshot](about/sample_screenshot.png)
 
 ## 📌 Overview
