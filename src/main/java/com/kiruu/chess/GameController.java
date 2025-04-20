@@ -5,6 +5,7 @@ import com.kiruu.chess.model.GameManager;
 import com.kiruu.chess.model.Piece;
 import com.kiruu.chess.model.pieces.*;
 import com.kiruu.chess.player.Player;
+import com.kiruu.chess.player.types.AIPlayer;
 import com.kiruu.chess.player.types.HumanPlayer;
 import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
@@ -21,11 +22,15 @@ import java.lang.reflect.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.awt.Color;
+
+import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.HARD;
+
 public class GameController {
-    private Player player;
+    private Player player, opponent;
     private GameManager gm;
     private boolean isClickedOnce = false;
     private Position firstPos, secondPos;
+    private int GAMEMODE; // -1 for 2 players, 0 for AI, and 1 for Multiplayer
     @FXML
     private Label LABEL_TURN;
 
@@ -42,10 +47,20 @@ public class GameController {
     private final Button[][] buttons = new Button[8][8];
 
     public GameController() {
-        player = new HumanPlayer("Raven", Color.WHITE);
-        gm = new GameManager(player);
+        // For now, the default game state is -1
+        GAMEMODE = -1;
+        switch (GAMEMODE) {
+            case -1:
+                player = new HumanPlayer("Player 1", Color.WHITE);
+                opponent = new HumanPlayer("Player 2", Color.BLACK);
+                break;
+            case 0:
+                player = new HumanPlayer("Player", Color.WHITE);
+                opponent = new AIPlayer("Player", Color.BLACK, HARD);
+                break;
+        }
+        gm = new GameManager(player, opponent);
     }
-
     public void initialize() {
         populateButtonMatrix();
         updateBoardUI();
@@ -157,9 +172,12 @@ public class GameController {
         }
     }
 
-
-    public void highlightTiles(ArrayList<Position> pos) {
-
+    // === FIX THE BUTTON SIZE TO AVOID MISCLICKS
+    public void highlightTiles(ArrayList<Position> pos, Position origin) {
+        buttons[origin.getRow()][origin.getCol()].setStyle(
+                "-fx-background-color: wheat; " +
+                        "-fx-effect: dropshadow(gaussian, rgba(244, 164, 96, 0.75), 30, 0.6, 0, 0);"
+        );
         for (Position p : pos) {
             buttons[p.getRow()][p.getCol()].setStyle(
                     "-fx-background-color: saddlebrown; " +
@@ -178,21 +196,35 @@ public class GameController {
 
     public void handleClick(ActionEvent e) {
         String getFXID = ((Node) e.getSource()).getId();
-        System.err.println(getFXID);
-        if (!isClickedOnce) {
-            firstPos = Position.getNotation(getFXID);
-            if (gm.getPiece(firstPos).getColor() != gm.getCurrentTurn())
-                return;
-            highlightTiles(gm.getPossibleMoves(getFXID));
-            isClickedOnce = true;
-        } else {
-            secondPos = Position.getNotation(getFXID);
-            boolean moveSuccessful = gm.makeMove(new Move(firstPos, secondPos));
-            LABEL_TURN.setText((gm.getCurrentTurn() == Color.BLACK ? "BLACK" : "WHITE") + "\'S TURN");
-            System.out.println("[GAME] Move success: " + moveSuccessful);
-            clearTiles();
-            updateBoardUI();
-            isClickedOnce = false;
+
+        switch (GAMEMODE) {
+            case -1:
+                if (!isClickedOnce) {
+                    firstPos = Position.getNotation(getFXID);
+                    // ======= TEMPORARY FAILSAFE APPROACH
+                    if (gm.getBoardState()[firstPos.getRow()][firstPos.getCol()] == null)
+                        return;
+                    if (gm.getPiece(firstPos).getColor() != gm.getCurrentTurn()
+                            && gm.getPiece(firstPos) != null)
+                        return;
+                    highlightTiles(gm.getPossibleMoves(getFXID), firstPos);
+                    isClickedOnce = true;
+                } else {
+                    secondPos = Position.getNotation(getFXID);
+                    Player current = gm.getCurrentTurn() == player.getColor() ? player : opponent;
+                    boolean moveSuccessful = gm.makeMove(new Move(firstPos, secondPos), current);
+                    LABEL_TURN.setText((gm.getCurrentTurn() == Color.BLACK ? "BLACK" : "WHITE") + "\'S TURN");
+                    System.out.println("[GAME] Move success: " + moveSuccessful);
+                    clearTiles();
+                    updateBoardUI();
+                    isClickedOnce = false;
+                }
+                break;
+            case 0:
+                // This snippet prevents the current player in this session to avoid making moves
+                if (player != gm.getCurrentPlayer())
+                    return;
         }
+
     }
 }
