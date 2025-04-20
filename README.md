@@ -1,9 +1,14 @@
 # ♟ Chess Game Project (ONGOING)
 
 ## Current Development Progress
+### April 19
 * Created visual board and move highlighter
 * Create the base classes for fundamental game logic
 * Added Pawn behavior
+### April 20
+* Added other pieces' behavior
+* Added En Passant and Castling
+* Added temporary turn-checking failsafes
 ![Sample Screenshot](about/sample_screenshot.png)
 
 ## 📌 Overview
