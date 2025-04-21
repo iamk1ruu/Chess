@@ -12,6 +12,11 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kiruu.chess.GameController">
     <children>
+      <ImageView fitHeight="800.0" fitWidth="1000.0" pickOnBounds="true">
+         <image>
+            <Image url="@img/menu_bg.jpeg" />
+         </image>
+      </ImageView>
       <Label fx:id="LABEL_TURN" alignment="CENTER" layoutX="256.0" layoutY="684.0" prefHeight="62.0" prefWidth="494.0" text="WHITE'S TURN" wrapText="true">
          <font>
             <Font name="Artifakt Element Book Italic" size="26.0" />
@@ -130,7 +135,7 @@
             <Font name="Artifakt Element Book Italic" size="26.0" />
          </font>
       </Label>
-      <AnchorPane fx:id="promotionPane" layoutX="256.0" layoutY="193.0" prefHeight="358.0" prefWidth="455.0" style="-fx-background-color: tan;">
+      <AnchorPane fx:id="promotionPane" layoutX="256.0" layoutY="193.0" prefHeight="358.0" prefWidth="455.0" style="-fx-background-color: tan; -fx-border-color: black; -fx-border-width: 8; -fx-background-radius: 12; -fx-border-radius: 12;">
          <children>
             <Label fx:id="LABEL_TURN1" alignment="CENTER" layoutY="14.0" prefHeight="62.0" prefWidth="494.0" text="Select a piece to transform to" wrapText="true">
                <font>

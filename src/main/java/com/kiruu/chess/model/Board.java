@@ -1,6 +1,7 @@
 package com.kiruu.chess.model;
 
 import com.kiruu.chess.model.pieces.*;
+import com.kiruu.chess.util.FENParser;
 import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
 
@@ -24,6 +25,7 @@ public class Board {
     }
 
     public void initializeBoard() {
+
         Piece[] backRowBlack = {
                 new Rook(Color.BLACK), new Knight(Color.BLACK), new Bishop(Color.BLACK), new Queen(Color.BLACK),
                 new King(Color.BLACK), new Bishop(Color.BLACK), new Knight(Color.BLACK), new Rook(Color.BLACK)
@@ -49,10 +51,17 @@ public class Board {
                 board[row][col] = null;
             }
         }
+
+
+
     }
 
     public Piece[][] getBoardState() {
         return board;
+    }
+    // ==== CHECK FOR VULNERABILITY
+    public void setBoardState(Piece[][] board) {
+        this.board = board;
     }
 
     public ArrayList<Position> validMoves(Position from) {
@@ -569,6 +578,10 @@ public class Board {
                 && board[move.getTo().getRow()][move.getTo().getCol()].getColor() == Color.BLACK) {
             return 2;
         }
+        System.err.println("[DEBUG] Checking stalemate...");
+        if (isStalemate(Color.WHITE)) return 7;
+        if (isStalemate(Color.BLACK)) return 8;
+        System.err.println("[DEBUG] Checking checkmate...");
         if (isCheckmate(Color.WHITE)) return 5;
         if (isCheckmate(Color.BLACK)) return 6;
         if (isInCheck(Color.WHITE)) return 3;
@@ -615,4 +628,22 @@ public class Board {
 
         return legalMoves;
     }
+    public boolean isStalemate(Color color) {
+        if (isInCheck(color)) return false; // Can't be stalemate if in check
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                Piece piece = board[r][c];
+                if (piece != null && piece.getColor() == color) {
+                    ArrayList<Position> moves = validMoves(new Position(r, c));
+                    if (!moves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
 }

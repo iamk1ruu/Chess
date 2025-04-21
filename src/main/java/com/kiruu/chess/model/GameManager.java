@@ -4,6 +4,7 @@ import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
 import com.kiruu.chess.player.Player;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -14,8 +15,9 @@ public class GameManager {
     private final Board board;
     private int state = -1;
     private boolean gameOver = false;
+    private boolean isDraw = false;
     private Color winner = null;
-    // State constants
+
     public static final int NO_SPECIAL_STATE = -1;
     public static final int WHITE_PROMOTION = 1;
     public static final int BLACK_PROMOTION = 2;
@@ -23,6 +25,8 @@ public class GameManager {
     public static final int BLACK_IN_CHECK = 4;
     public static final int WHITE_CHECKMATE = 5;
     public static final int BLACK_CHECKMATE = 6;
+    public static final int WHITE_STALEMATE = 7;
+    public static final int BLACK_STALEMATE = 8;
 
     public GameManager(Player player1, Player player2) {
         if (player1.getColor() == Color.WHITE) {
@@ -40,7 +44,16 @@ public class GameManager {
     public Player getCurrentPlayer() {
         return currentTurn == Color.WHITE ? whitePlayer : blackPlayer;
     }
-
+    public Move getAbsolutePosition(Move move) {
+        int fromRow = Math.abs(move.getFrom().getRow() - 7);
+        int fromCol = Math.abs(move.getFrom().getCol() - 7);
+        Position from = new Position(fromRow, fromCol);
+        int toRow = Math.abs(move.getTo().getRow() - 7);
+        int toCol = Math.abs(move.getTo().getCol() - 7);
+        Position to = new Position(toRow, toCol);
+        System.err.println("[DEBUG] From: " + fromRow + " " + fromCol + "To: " + toRow + " " + toCol);
+        return new Move(from, to);
+    }
     public boolean makeMove(Move move, Player p) {
         if (p != getCurrentPlayer()) {
             System.err.println("Invalid move: it's not your turn.");
@@ -116,8 +129,14 @@ public class GameManager {
     public Color getWinner() {
         return winner;
     }
+    public void setDraw() {
+        isDraw = true;
+        gameOver = true;
+        winner = null;
+    }
     public void setGameOver(Color winner) {
         System.err.println("[GAME] " + (Color.black == winner ? "BLACK" : "WHITE" )+ " Wins!");
+        JOptionPane.showMessageDialog(null, ((Color.black == winner ? "BLACK" : "WHITE" )+ " Wins!"));
         gameOver = true;
         this.winner = winner;
     }

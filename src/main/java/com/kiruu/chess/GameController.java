@@ -20,6 +20,7 @@ import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
 import java.awt.Color;
+
 import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.EASY;
 import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.HARD;
 
@@ -30,7 +31,7 @@ public class GameController {
     private Position firstPos, secondPos;
     private Position promotionPosition;
     private int GAMEMODE; // -1 for 2 players, 0 for AI, and 1 for Multiplayer
-
+    private boolean orientedAtWhite;
     @FXML
     private Label LABEL_TURN;
 
@@ -66,11 +67,12 @@ public class GameController {
                 break;
             case 0:
                 player = new HumanPlayer("Player", Color.WHITE);
-                opponent = new AIPlayer("Player", Color.BLACK, HARD);
+                //opponent = new AIPlayer("Player", Color.BLACK, HARD);
                 break;
         }
         gm = new GameManager(player, opponent);
-
+        //orientedAtWhite = player.getColor() == Color.WHITE;
+        orientedAtWhite = true;
     }
 
     public void initialize() {
@@ -109,6 +111,7 @@ public class GameController {
             setupPromotionHandlers();
         }
     }
+
 
     private void setupPromotionHandlers() {
         if (queenButton != null) {
@@ -197,41 +200,82 @@ public class GameController {
         clearTiles();
         IMAGE_BOARD.setVisible(true);
         GRID_CONTAINER.setVisible(true);
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                Piece currentPiece = state[i][j];
-                if (currentPiece != null) {
-                    String colorPrefix = currentPiece.getColor() == Color.WHITE ? "w" : "b";
-                    String pieceName = "";
+        if (orientedAtWhite) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    Piece currentPiece = state[i][j];
+                    if (currentPiece != null) {
+                        String colorPrefix = currentPiece.getColor() == Color.WHITE ? "w" : "b";
+                        String pieceName = "";
 
-                    if (currentPiece instanceof Pawn) {
-                        pieceName = "p";
-                    } else if (currentPiece instanceof Rook) {
-                        pieceName = "r";
-                    } else if (currentPiece instanceof Knight) {
-                        pieceName = "n";
-                    } else if (currentPiece instanceof Bishop) {
-                        pieceName = "b";
-                    } else if (currentPiece instanceof Queen) {
-                        pieceName = "q";
-                    } else if (currentPiece instanceof King) {
-                        pieceName = "k";
+                        if (currentPiece instanceof Pawn) {
+                            pieceName = "p";
+                        } else if (currentPiece instanceof Rook) {
+                            pieceName = "r";
+                        } else if (currentPiece instanceof Knight) {
+                            pieceName = "n";
+                        } else if (currentPiece instanceof Bishop) {
+                            pieceName = "b";
+                        } else if (currentPiece instanceof Queen) {
+                            pieceName = "q";
+                        } else if (currentPiece instanceof King) {
+                            pieceName = "k";
+                        }
+
+                        String imagePath = "/com/kiruu/chess/img/" + colorPrefix + pieceName + ".png";
+                        Image img = new Image(getClass().getResourceAsStream(imagePath));
+                        ImageView imgView = new ImageView(img);
+                        imgView.setFitWidth(50);
+                        imgView.setFitHeight(50);
+                        buttons[i][j].setGraphic(imgView);
+                        buttons[i][j].setText(""); // Remove text in case previously set
+                    } else {
+                        buttons[i][j].setGraphic(null);
+                        buttons[i][j].setText("");
                     }
-
-                    String imagePath = "/com/kiruu/chess/img/" + colorPrefix + pieceName + ".png";
-                    Image img = new Image(getClass().getResourceAsStream(imagePath));
-                    ImageView imgView = new ImageView(img);
-                    imgView.setFitWidth(50);
-                    imgView.setFitHeight(50);
-                    buttons[i][j].setGraphic(imgView);
-                    buttons[i][j].setText(""); // Remove text in case previously set
-                } else {
-                    buttons[i][j].setGraphic(null);
-                    buttons[i][j].setText("");
                 }
             }
-        }
+        } else {
+            for (int i = 7; i >= 0; i--) { // reversed row loop
+                for (int j = 7; j >= 0; j--) { // reversed column loop
+                    int displayRow = 7 - i;
+                    int displayCol = 7 - j;
 
+                    Piece currentPiece = state[i][j];
+                    if (currentPiece != null) {
+                        String colorPrefix = currentPiece.getColor() == Color.WHITE ? "w" : "b";
+                        String pieceName = "";
+
+                        if (currentPiece instanceof Pawn) {
+                            pieceName = "p";
+                        } else if (currentPiece instanceof Rook) {
+                            pieceName = "r";
+                        } else if (currentPiece instanceof Knight) {
+                            pieceName = "n";
+                        } else if (currentPiece instanceof Bishop) {
+                            pieceName = "b";
+                        } else if (currentPiece instanceof Queen) {
+                            pieceName = "q";
+                        } else if (currentPiece instanceof King) {
+                            pieceName = "k";
+                        }
+
+                        String imagePath = "/com/kiruu/chess/img/" + colorPrefix + pieceName + ".png";
+                        Image img = new Image(getClass().getResourceAsStream(imagePath));
+                        ImageView imgView = new ImageView(img);
+                        imgView.setFitWidth(50);
+                        imgView.setFitHeight(50);
+                        buttons[displayRow][displayCol].setGraphic(imgView);
+                        buttons[displayRow][displayCol].setText("");
+                    } else {
+                        buttons[displayRow][displayCol].setGraphic(null);
+                        buttons[displayRow][displayCol].setText("");
+                    }
+                }
+            }
+
+            updateTurnLabel();
+        }
         updateTurnLabel();
     }
 
@@ -282,16 +326,20 @@ public class GameController {
                     if (gm.getPiece(firstPos).getColor() != gm.getCurrentTurn()
                             && gm.getPiece(firstPos) != null)
                         return;
+                    System.err.println("[DEBUG] Color: " + (gm.getPiece(firstPos).getColor() == Color.WHITE ? "White" : "Black"));
                     highlightTiles(gm.getPossibleMoves(getFXID), firstPos);
                     isClickedOnce = true;
                 } else {
                     secondPos = Position.getNotation(getFXID);
                     Player current = gm.getCurrentTurn() == player.getColor() ? player : opponent;
-
-                    boolean moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
-
+                    boolean moveMade;
+                    if (orientedAtWhite) {
+                        moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
+                    } else {
+                        moveMade = gm.makeMove(gm.getAbsolutePosition(new Move(firstPos, secondPos)), current);
+                    }
+                    // ==== CREATE A SEPARATE METHOD FOR THIS LATER
                     if (moveMade) {
-                        // Check if promotion is needed
                         int state = gm.getState();
 
                         if (state == GameManager.WHITE_PROMOTION || state == GameManager.BLACK_PROMOTION) {
@@ -308,6 +356,12 @@ public class GameController {
                             gm.setGameOver(winner);
                             gameOver(winner);
                         }
+                        if (state == GameManager.WHITE_STALEMATE || state == GameManager.BLACK_STALEMATE) {
+                            Color winner = state == GameManager.WHITE_STALEMATE ? Color.BLACK : Color.WHITE;
+                            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Stalemate");
+                            gm.setDraw();
+                            gameOver(null);
+                        }
 
                     }
 
@@ -319,8 +373,11 @@ public class GameController {
                 // This snippet prevents the current player in this session to avoid making moves
                 if (player != gm.getCurrentPlayer())
                     return;
+                break;
         }
+
     }
+
 
     private void showPromotionPane(Color color) {
         if (promotionPane != null) {
@@ -333,6 +390,7 @@ public class GameController {
             System.err.println("Promotion pane not found in FXML!");
         }
     }
+
     public void gameOver(Color winner) {
         GRID_CONTAINER.setDisable(true);
         LABEL_TURN.setVisible(false);

@@ -5,6 +5,7 @@ import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
 
 import java.awt.*;
+import java.io.IOException;
 
 public abstract class Player {
     private Color color;
@@ -16,5 +17,5 @@ public abstract class Player {
     }
     public String getName() {return name;}
     public Color getColor() {return color;}
-    public abstract Move makeMove(Board board);
+    public abstract Move makeMove(Board board) throws IOException;
 }
