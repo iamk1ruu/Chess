@@ -4,6 +4,7 @@ import com.kiruu.chess.model.pieces.*;
 import com.kiruu.chess.util.FENParser;
 import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
+import org.checkerframework.checker.units.qual.A;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,19 +13,22 @@ import java.util.Scanner;
 
 public class Board {
     private Piece[][] board = new Piece[8][8];
-    private ArrayList<Position> doubleForwardPawns = new ArrayList<>();
-    private boolean hasWhiteKingMoved = false;
-    private boolean hasBlackKingMoved = false;
-    private boolean hasWhiteKingsideRookMoved = false;
-    private boolean hasWhiteQueensideRookMoved = false;
-    private boolean hasBlackKingsideRookMoved = false;
-    private boolean hasBlackQueensideRookMoved = false;
+    public ArrayList<Position> doubleForwardPawns = new ArrayList<>();
+    private ArrayList<Move> whiteLastThreeMoves, blackLastThreeMoves;
+    public boolean hasWhiteKingMoved = false;
+    public boolean hasBlackKingMoved = false;
+    public boolean hasWhiteKingsideRookMoved = false;
+    public boolean hasWhiteQueensideRookMoved = false;
+    public boolean hasBlackKingsideRookMoved = false;
+    public boolean hasBlackQueensideRookMoved = false;
 
     private boolean isInBounds(int row, int col) {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
     }
 
     public void initializeBoard() {
+        whiteLastThreeMoves = new ArrayList<>();
+        blackLastThreeMoves = new ArrayList<>();
 
         Piece[] backRowBlack = {
                 new Rook(Color.BLACK), new Knight(Color.BLACK), new Bishop(Color.BLACK), new Queen(Color.BLACK),
@@ -52,7 +56,7 @@ public class Board {
             }
         }
 
-
+        //setBoardState(FENParser.decode("8/8/8/8/8/2k5/3R4/3K4 w - - 0 1\n"));
 
     }
 
@@ -484,7 +488,7 @@ public class Board {
                     board[from.getRow()][from.getCol()] = null;
                     doubleForwardPawns.clear();
                     return;
-                }
+                        }
                 doubleForwardPawns.clear();
             }
         }
@@ -528,12 +532,32 @@ public class Board {
                 }
             }
         }
-
+        // Record last three moves
+        if (movingPiece.getColor() == Color.WHITE) {
+            if (whiteLastThreeMoves.size() == 20)
+                whiteLastThreeMoves.removeFirst();
+            System.err.println("[DEBUG] Tracking White move...");
+            whiteLastThreeMoves.add(move);
+        } else {
+            if (blackLastThreeMoves.size() == 20)
+                blackLastThreeMoves.removeFirst();
+            System.err.println("[DEBUG] Tracking Black move...");
+            blackLastThreeMoves.add(move);
+        }
         board[to.getRow()][to.getCol()] = movingPiece;
         board[from.getRow()][from.getCol()] = null;
     }
 
-
+    public boolean checkDrawByRepetition(Color color) {
+        int counter = 0;
+        ArrayList<Move> moves = color == Color.WHITE ? whiteLastThreeMoves : blackLastThreeMoves;
+        for (Move move : moves) {
+            counter = move.equals(moves) ? counter + 1 : counter;
+            if (counter == 3)
+                return true;
+        }
+        return false;
+    }
     public boolean isInCheck(Color color) {
         Position kingPos = findKing(color);
         if (kingPos == null) return false; // Safety check
@@ -579,6 +603,8 @@ public class Board {
             return 2;
         }
         System.err.println("[DEBUG] Checking stalemate...");
+        if (checkDrawByRepetition(Color.WHITE)) return 9;
+        if (checkDrawByRepetition(Color.BLACK)) return 10;
         if (isStalemate(Color.WHITE)) return 7;
         if (isStalemate(Color.BLACK)) return 8;
         System.err.println("[DEBUG] Checking checkmate...");

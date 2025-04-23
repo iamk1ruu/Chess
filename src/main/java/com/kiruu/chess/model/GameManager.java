@@ -1,11 +1,13 @@
 package com.kiruu.chess.model;
 
+import com.kiruu.chess.player.types.AIPlayer;
 import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
 import com.kiruu.chess.player.Player;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class GameManager {
@@ -27,7 +29,8 @@ public class GameManager {
     public static final int BLACK_CHECKMATE = 6;
     public static final int WHITE_STALEMATE = 7;
     public static final int BLACK_STALEMATE = 8;
-
+    public static final int WHITE_REPETITION_DRAW = 9;
+    public static final int BLACK_REPETITION_DRAW = 10;
     public GameManager(Player player1, Player player2) {
         if (player1.getColor() == Color.WHITE) {
             whitePlayer = player1;
@@ -54,7 +57,7 @@ public class GameManager {
         System.err.println("[DEBUG] From: " + fromRow + " " + fromCol + "To: " + toRow + " " + toCol);
         return new Move(from, to);
     }
-    public boolean makeMove(Move move, Player p) {
+    public boolean makeMove(Move move, Player p) throws IOException {
         if (p != getCurrentPlayer()) {
             System.err.println("Invalid move: it's not your turn.");
             return false;
@@ -75,6 +78,9 @@ public class GameManager {
             // Only switch turn if promotion isn't happening
             if (state != WHITE_PROMOTION && state != BLACK_PROMOTION) {
                 switchTurn();
+                if (blackPlayer instanceof AIPlayer) {
+                    board.move(blackPlayer.makeMove(board));
+                }
                 System.out.println("[DEBUG] Switched Turn");
             } else {
                 System.out.println("[DEBUG] Promotion pending, turn not switched yet");

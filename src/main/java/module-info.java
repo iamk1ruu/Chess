@@ -4,6 +4,7 @@ module com.kiruu.chess {
     requires java.desktop;
     requires java.sql;
     requires jlama.core;
+    requires org.checkerframework.checker.qual;
 
 
     opens com.kiruu.chess to javafx.fxml;
