@@ -1,0 +1,26 @@
+/* Apply the vintage style to the button */
+.vintage-button {
+    -fx-background-color: linear-gradient(to bottom, #f8d7a1, #f1c27d); /* Warm vintage gradient */
+    -fx-background-radius: 12; /* Rounded corners */
+    -fx-border-radius: 12; /* Matching rounded corners on the border */
+    -fx-border-color: #a57945; /* Dark border color */
+    -fx-border-width: 2px; /* Border width */
+    -fx-text-fill: #4d4d4d; /* Dark text color */
+    -fx-font-size: 16px; /* Font size */
+    -fx-font-family: "Arial", sans-serif; /* Font choice */
+    -fx-padding: 10 20; /* Padding around the text */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0.5, 2, 2); /* Subtle shadow for a vintage feel */
+    -fx-transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
+}
+
+.vintage-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #f1c27d, #f8d7a1); /* Swap gradient on hover */
+    -fx-text-fill: #2c2c2c; /* Darker text on hover */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 6, 0.7, 3, 3); /* Stronger shadow on hover */
+}
+
+.vintage-button:pressed {
+    -fx-background-color: #f1c27d; /* Lighter color on press */
+    -fx-border-color: #8c5d2d; /* Darker border on press */
+    -fx-effect: none; /* Remove shadow when pressed */
+}
