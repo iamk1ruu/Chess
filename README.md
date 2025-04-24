@@ -13,6 +13,7 @@
 * Added Check, and Checkmate
 * Added temporary Game Over functions
 ### April 21
+* Made the switch from LLM to StockFish since getting responses from local LLMs take too long, and it may hallucinate over time
 * Figured out how to integrate Stockfish
 ### April 22-23
 * Created Stockfish Base Client Class
