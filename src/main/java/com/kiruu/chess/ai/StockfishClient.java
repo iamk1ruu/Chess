@@ -34,20 +34,34 @@ public class StockfishClient {
         }
         return output.toString();
     }
+
     public void stopEngine() throws IOException {
         sendCommand("quit");
         processReader.close();
         processWriter.close();
     }
 
-    public String getBestMove(String fen, int timeLimitMillis) throws IOException {
+    public void setDifficulty(StockfishDifficulty difficulty) throws IOException {
+        sendCommand("setoption name Skill Level value " + difficulty.getSkillLevel());
+        sendCommand("setoption name UCI_LimitStrength value true");
+        int elo = 1000 + (difficulty.getSkillLevel() * 100);
+        sendCommand("setoption name UCI_Elo value " + elo);
+    }
+
+    public String getBestMove(String fen, StockfishDifficulty difficulty) throws IOException {
+        setDifficulty(difficulty);
         sendCommand("uci");
         sendCommand("isready");
-        System.err.println("[DEBUG] Sent command to StockFish");
         getOutput(100);  // Wait for "readyok"
         sendCommand("position fen " + fen);
-        sendCommand("go movetime " + timeLimitMillis);
-        String output = getOutput(timeLimitMillis + 100);
+
+        if (difficulty.getThinkTime() <= 300) {
+            sendCommand("go movetime " + difficulty.getThinkTime());
+        } else {
+            sendCommand("go depth " + difficulty.getDepth() + " movetime " + difficulty.getThinkTime());
+        }
+
+        String output = getOutput(difficulty.getThinkTime());
         for (String line : output.split("\n")) {
             if (line.startsWith("bestmove")) {
                 return line.split(" ")[1];
@@ -55,4 +69,5 @@ public class StockfishClient {
         }
         return null;
     }
+
 }

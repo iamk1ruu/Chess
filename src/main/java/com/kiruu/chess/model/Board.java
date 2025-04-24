@@ -26,37 +26,19 @@ public class Board {
     }
 
     public void initializeBoard() {
+        setBoardState(FENParser.decode("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
+
+        // Reset move tracking
+        hasWhiteKingMoved = false;
+        hasBlackKingMoved = false;
+        hasWhiteKingsideRookMoved = false;
+        hasWhiteQueensideRookMoved = false;
+        hasBlackKingsideRookMoved = false;
+        hasBlackQueensideRookMoved = false;
+
         whiteLastThreeMoves = new ArrayList<>();
         blackLastThreeMoves = new ArrayList<>();
-
-        Piece[] backRowBlack = {
-                new Rook(Color.BLACK), new Knight(Color.BLACK), new Bishop(Color.BLACK), new Queen(Color.BLACK),
-                new King(Color.BLACK), new Bishop(Color.BLACK), new Knight(Color.BLACK), new Rook(Color.BLACK)
-        };
-        Piece[] backRowWhite = {
-                new Rook(Color.WHITE), new Knight(Color.WHITE), new Bishop(Color.WHITE), new Queen(Color.WHITE),
-                new King(Color.WHITE), new Bishop(Color.WHITE), new Knight(Color.WHITE), new Rook(Color.WHITE)
-        };
-
-        for (int col = 0; col < 8; col++) {
-            board[0][col] = backRowBlack[col];
-            board[7][col] = backRowWhite[col];
-        }
-
-        for (int col = 0; col < 8; col++) {
-            board[1][col] = new Pawn(Color.BLACK);
-            board[6][col] = new Pawn(Color.WHITE);
-        }
-
-        // Initialize remaining cells to null
-        for (int row = 2; row < 6; row++) {
-            for (int col = 0; col < 8; col++) {
-                board[row][col] = null;
-            }
-        }
-
-        //setBoardState(FENParser.decode("8/8/8/8/8/2k5/3R4/3K4 w - - 0 1\n"));
-
+        doubleForwardPawns.clear();
     }
 
     public Piece[][] getBoardState() {

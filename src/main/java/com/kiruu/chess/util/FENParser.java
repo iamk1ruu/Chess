@@ -47,7 +47,7 @@ public class FENParser {
                         fen.append(emptyCount);
                         emptyCount = 0;
                     }
-                    String symbol = piece.getSymbol();
+                    String symbol = identifySymbol(piece);
                     fen.append(piece.getColor() == Color.WHITE ? symbol.toUpperCase() : symbol.toLowerCase());
                 }
             }
@@ -56,8 +56,8 @@ public class FENParser {
             }
             if (row < 7) fen.append('/');
         }
-        // Side to move — defaulting to white (can add tracking later)
-        String sideToMove = "w";
+        // ===== BLACK TO MOVE BY DEFAULT
+        String sideToMove = "b";
 
         // Castling rights
         StringBuilder castling = new StringBuilder();
@@ -106,5 +106,19 @@ public class FENParser {
             case 'k': return new King(color);
             default: return null;
         }
+    }
+
+    public static String identifySymbol(Piece piece) {
+        if (piece == null) return "";
+
+        return switch (piece) {
+            case Pawn p -> "p";
+            case Rook r -> "r";
+            case Knight n -> "n";
+            case Bishop b -> "b";
+            case Queen q -> "q";
+            case King k -> "k";
+            default -> "";
+        };
     }
 }

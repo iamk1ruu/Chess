@@ -32,6 +32,7 @@ public class GameManager {
     public static final int BLACK_STALEMATE = 8;
     public static final int WHITE_REPETITION_DRAW = 9;
     public static final int BLACK_REPETITION_DRAW = 10;
+
     public GameManager(Player player1, Player player2) {
         if (player1.getColor() == Color.WHITE) {
             whitePlayer = player1;
@@ -48,6 +49,7 @@ public class GameManager {
     public Player getCurrentPlayer() {
         return currentTurn == Color.WHITE ? whitePlayer : blackPlayer;
     }
+
     public Move getAbsolutePosition(Move move) {
         int fromRow = Math.abs(move.getFrom().getRow() - 7);
         int fromCol = Math.abs(move.getFrom().getCol() - 7);
@@ -58,7 +60,8 @@ public class GameManager {
         System.err.println("[DEBUG] From: " + fromRow + " " + fromCol + "To: " + toRow + " " + toCol);
         return new Move(from, to);
     }
-    public boolean makeMove(Move move, Player p) throws IOException {
+
+    public boolean makeMove(Move move, Player p) {
         if (p != getCurrentPlayer()) {
             System.err.println("Invalid move: it's not your turn.");
             return false;
@@ -78,13 +81,6 @@ public class GameManager {
             // Only switch turn if promotion isn't happening
             if (state != WHITE_PROMOTION && state != BLACK_PROMOTION) {
                 switchTurn();
-
-                if (blackPlayer instanceof AIPlayer) {
-                    String fenString = FENParser.encode(board);
-                    System.out.println(fenString);
-                    board.move(blackPlayer.makeMove(fenString));
-                }
-
                 System.out.println("[DEBUG] Switched Turn");
             } else {
                 System.out.println("[DEBUG] Promotion pending, turn not switched yet");
@@ -106,6 +102,14 @@ public class GameManager {
 
     public Color getCurrentTurn() {
         return currentTurn;
+    }
+
+    public void AImove() throws IOException {
+
+        String fenString = FENParser.encode(board);
+        System.out.println(fenString);
+        board.move(blackPlayer.makeMove(fenString));
+        switchTurn();
     }
 
     public void promotePawn(Position position, Piece promotedPiece) {
@@ -133,20 +137,24 @@ public class GameManager {
     public Board getBoard() {
         return board;
     }
+
     public boolean isGameOver() {
         return gameOver;
     }
+
     public Color getWinner() {
         return winner;
     }
+
     public void setDraw() {
         isDraw = true;
         gameOver = true;
         winner = null;
     }
+
     public void setGameOver(Color winner) {
-        System.err.println("[GAME] " + (Color.black == winner ? "BLACK" : "WHITE" )+ " Wins!");
-        JOptionPane.showMessageDialog(null, ((Color.black == winner ? "BLACK" : "WHITE" )+ " Wins!"));
+        System.err.println("[GAME] " + (Color.black == winner ? "BLACK" : "WHITE") + " Wins!");
+        JOptionPane.showMessageDialog(null, ((Color.black == winner ? "BLACK" : "WHITE") + " Wins!"));
         gameOver = true;
         this.winner = winner;
     }

@@ -8,6 +8,10 @@ import com.kiruu.chess.player.types.AIPlayer;
 import com.kiruu.chess.player.types.HumanPlayer;
 import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
+import com.kiruu.chess.util.PostClickEventHandler;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -32,6 +36,7 @@ public class GameController {
     private Position promotionPosition;
     private int GAMEMODE; // -1 for 2 players, 0 for AI, and 1 for Multiplayer
     private boolean orientedAtWhite;
+    private BooleanProperty AIturn = new SimpleBooleanProperty(false);
     @FXML
     private Label LABEL_TURN;
 
@@ -194,6 +199,27 @@ public class GameController {
         buttons[7][5] = f1;
         buttons[7][6] = g1;
         buttons[7][7] = h1;
+        // For a 2D array of buttons (8x8 grid)
+        if (GAMEMODE == 0) {
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    buttons[row][col].setOnAction(new PostClickEventHandler(
+                            this::handleClick,
+                            () -> {
+                                // Only run after-click logic when it's Black's turn
+                                if (gm.getCurrentTurn() == Color.BLACK) {
+                                    try {
+                                        AImove();
+                                        updateBoardUI();
+                                    } catch (IOException e) {
+                                        System.err.println("Error in after-click action: " + e.getMessage());
+                                    }
+                                }
+                            }
+                    ));
+                }
+            }
+        }
     }
 
     public void updateBoardUI() {
@@ -309,7 +335,7 @@ public class GameController {
         }
     }
 
-    public void handleClick(ActionEvent e) throws IOException {
+    public void handleClick(ActionEvent e) {
         // If promotion pane is visible, ignore board clicks
         if (promotionPane != null && promotionPane.isVisible()) {
             return;
@@ -321,124 +347,102 @@ public class GameController {
             case -1:
                 if (!isClickedOnce) {
                     firstPos = Position.getNotation(getFXID);
-                    // ======= TEMPORARY FAILSAFE APPROACH
                     if (gm.getBoardState()[firstPos.getRow()][firstPos.getCol()] == null)
                         return;
                     if (gm.getPiece(firstPos).getColor() != gm.getCurrentTurn()
                             && gm.getPiece(firstPos) != null)
                         return;
-                    System.err.println("[DEBUG] Color: " + (gm.getPiece(firstPos).getColor() == Color.WHITE ? "White" : "Black"));
                     highlightTiles(gm.getPossibleMoves(getFXID), firstPos);
                     isClickedOnce = true;
                 } else {
                     secondPos = Position.getNotation(getFXID);
                     Player current = gm.getCurrentTurn() == player.getColor() ? player : opponent;
-                    boolean moveMade;
-                    if (orientedAtWhite) {
-                        moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
-                    } else {
-                        moveMade = gm.makeMove(gm.getAbsolutePosition(new Move(firstPos, secondPos)), current);
-                    }
-                    // ==== CREATE A SEPARATE METHOD FOR THIS LATER
+                    boolean moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
                     if (moveMade) {
-                        int state = gm.getState();
-
-                        if (state == GameManager.WHITE_PROMOTION || state == GameManager.BLACK_PROMOTION) {
-                            Color promotionColor = (state == GameManager.WHITE_PROMOTION) ? Color.WHITE : Color.BLACK;
-                            promotionPosition = secondPos;
-                            showPromotionPane(promotionColor);
-                        }
-                        if (state == GameManager.WHITE_IN_CHECK || state == GameManager.BLACK_IN_CHECK) {
-                            System.err.println("[DEBUG] King is in check.");
-                        }
-                        if (state == GameManager.WHITE_CHECKMATE || state == GameManager.BLACK_CHECKMATE) {
-                            Color winner = state == GameManager.WHITE_CHECKMATE ? Color.BLACK : Color.WHITE;
-                            System.err.println("[DEBUG] " + (state == 5 ? "White" : "Black") + "\'s King Checkmated");
-                            gm.setGameOver(winner);
-                            gameOver(winner);
-                        }
-                        if (state == GameManager.WHITE_STALEMATE || state == GameManager.BLACK_STALEMATE) {
-                            Color winner = state == GameManager.WHITE_STALEMATE ? Color.BLACK : Color.WHITE;
-                            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Stalemate");
-                            gm.setDraw();
-                            gameOver(null);
-                        }
-                        if (state == GameManager.WHITE_REPETITION_DRAW || state == GameManager.BLACK_REPETITION_DRAW) {
-                            Color winner = state == GameManager.WHITE_REPETITION_DRAW ? Color.WHITE : Color.BLACK;
-                            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Draw by Repetition");
-                            gm.setDraw();
-                            gameOver(null);
-                        }
-
+                        checkState(gm.getState());
                     }
-
                     updateBoardUI();
                     isClickedOnce = false;
                 }
                 break;
             case 0:
-                // This snippet prevents the current player in this session to avoid making moves
                 if (player != gm.getCurrentPlayer())
                     return;
                 if (!isClickedOnce) {
                     firstPos = Position.getNotation(getFXID);
-                    // ======= TEMPORARY FAILSAFE APPROACH
                     if (gm.getBoardState()[firstPos.getRow()][firstPos.getCol()] == null)
                         return;
                     if (gm.getPiece(firstPos).getColor() != gm.getCurrentTurn()
                             && gm.getPiece(firstPos) != null)
                         return;
-                    System.err.println("[DEBUG] Color: " + (gm.getPiece(firstPos).getColor() == Color.WHITE ? "White" : "Black"));
                     highlightTiles(gm.getPossibleMoves(getFXID), firstPos);
                     isClickedOnce = true;
                 } else {
                     secondPos = Position.getNotation(getFXID);
                     Player current = gm.getCurrentTurn() == player.getColor() ? player : opponent;
-                    boolean moveMade;
-                    moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
-
-                    // ==== CREATE A SEPARATE METHOD FOR THIS LATER
+                    boolean moveMade = gm.makeMove(new Move(firstPos, secondPos), current);
                     if (moveMade) {
-                        int state = gm.getState();
-
-                        if (state == GameManager.WHITE_PROMOTION || state == GameManager.BLACK_PROMOTION) {
-                            Color promotionColor = (state == GameManager.WHITE_PROMOTION) ? Color.WHITE : Color.BLACK;
-                            promotionPosition = secondPos;
-                            showPromotionPane(promotionColor);
-                        }
-                        if (state == GameManager.WHITE_IN_CHECK || state == GameManager.BLACK_IN_CHECK) {
-                            System.err.println("[DEBUG] King is in check.");
-                        }
-                        if (state == GameManager.WHITE_CHECKMATE || state == GameManager.BLACK_CHECKMATE) {
-                            Color winner = state == GameManager.WHITE_CHECKMATE ? Color.BLACK : Color.WHITE;
-                            System.err.println("[DEBUG] " + (state == 5 ? "White" : "Black") + "\'s King Checkmated");
-                            gm.setGameOver(winner);
-                            gameOver(winner);
-                        }
-                        if (state == GameManager.WHITE_STALEMATE || state == GameManager.BLACK_STALEMATE) {
-                            Color winner = state == GameManager.WHITE_STALEMATE ? Color.BLACK : Color.WHITE;
-                            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Stalemate");
-                            gm.setDraw();
-                            gameOver(null);
-                        }
-                        if (state == GameManager.WHITE_REPETITION_DRAW || state == GameManager.BLACK_REPETITION_DRAW) {
-                            Color winner = state == GameManager.WHITE_REPETITION_DRAW ? Color.WHITE : Color.BLACK;
-                            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Draw by Repetition");
-                            gm.setDraw();
-                            gameOver(null);
-                        }
-
+                        checkState(gm.getState());
                     }
-
                     updateBoardUI();
                     isClickedOnce = false;
                 }
                 break;
+
         }
-
     }
+    // Thanks to ChatGPT for fixing my threading method
+    public void AImove() throws IOException {
+        Task<Void> aiTask = new Task<>() {
+            @Override
+            protected Void call() throws IOException {
+                gm.AImove();
+                return null;
+            }
+        };
 
+        aiTask.setOnSucceeded(e -> {
+            try {
+                updateBoardUI();
+            } catch (Exception ex) {
+                System.err.println("Error updating board: " + ex.getMessage());
+            }
+        });
 
+        aiTask.setOnFailed(e -> {
+            Throwable exception = aiTask.getException();
+            System.err.println("AI move failed: " + exception.getMessage());
+        });
+        new Thread(aiTask).start();
+    }
+    public void checkState(int state) {
+        if (state == GameManager.WHITE_PROMOTION || state == GameManager.BLACK_PROMOTION) {
+            Color promotionColor = (state == GameManager.WHITE_PROMOTION) ? Color.WHITE : Color.BLACK;
+            promotionPosition = secondPos;
+            showPromotionPane(promotionColor);
+        }
+        if (state == GameManager.WHITE_IN_CHECK || state == GameManager.BLACK_IN_CHECK) {
+            System.err.println("[DEBUG] King is in check.");
+        }
+        if (state == GameManager.WHITE_CHECKMATE || state == GameManager.BLACK_CHECKMATE) {
+            Color winner = state == GameManager.WHITE_CHECKMATE ? Color.BLACK : Color.WHITE;
+            System.err.println("[DEBUG] " + (state == 5 ? "White" : "Black") + "\'s King Checkmated");
+            gm.setGameOver(winner);
+            gameOver(winner);
+        }
+        if (state == GameManager.WHITE_STALEMATE || state == GameManager.BLACK_STALEMATE) {
+            Color winner = state == GameManager.WHITE_STALEMATE ? Color.BLACK : Color.WHITE;
+            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Stalemate");
+            gm.setDraw();
+            gameOver(null);
+        }
+        if (state == GameManager.WHITE_REPETITION_DRAW || state == GameManager.BLACK_REPETITION_DRAW) {
+            Color winner = state == GameManager.WHITE_REPETITION_DRAW ? Color.WHITE : Color.BLACK;
+            System.err.println("[DEBUG] " + (state == 7 ? "White" : "Black") + "Draw by Repetition");
+            gm.setDraw();
+            gameOver(null);
+        }
+    }
     private void showPromotionPane(Color color) {
         if (promotionPane != null) {
             // Update promotion pane images based on the color
