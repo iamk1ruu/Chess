@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 public class Board {
     private Piece[][] board = new Piece[8][8];
     public ArrayList<Position> doubleForwardPawns = new ArrayList<>();

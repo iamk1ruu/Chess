@@ -34,7 +34,6 @@ public class StockfishClient {
         }
         return output.toString();
     }
-
     public void stopEngine() throws IOException {
         sendCommand("quit");
         processReader.close();

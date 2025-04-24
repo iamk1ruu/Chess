@@ -56,7 +56,6 @@ public class FENParser {
             }
             if (row < 7) fen.append('/');
         }
-
         // Side to move — defaulting to white (can add tracking later)
         String sideToMove = "w";
 

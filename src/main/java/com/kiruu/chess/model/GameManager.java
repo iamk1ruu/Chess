@@ -71,7 +71,6 @@ public class GameManager {
             System.err.println("Invalid move: no piece at the source.");
             return false;
         }
-
         if (board.validateMove(move)) {
             board.move(move);
             state = board.checkState(move);

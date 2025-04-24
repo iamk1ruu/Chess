@@ -6,7 +6,6 @@ import com.kiruu.chess.util.Position;
 
 import java.awt.*;
 import java.io.IOException;
-
 public abstract class Player {
     private Color color;
     private String name;

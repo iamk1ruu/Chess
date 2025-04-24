@@ -23,7 +23,6 @@ public class AIPlayer extends Player {
         this.client = new StockfishClient();
     }
 
-    // ==== IMPLEMENT LATER =========
     @Override
     public Move makeMove(String fen) throws IOException {
         StockfishClient stockfish = new StockfishClient();

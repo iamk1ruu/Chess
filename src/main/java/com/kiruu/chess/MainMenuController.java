@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class MainMenuController {
-
     // This method is triggered when the user presses the Duel button
     public void duel(ActionEvent e) {
         try {

@@ -21,7 +21,6 @@ import javafx.scene.layout.GridPane;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.Color;
-
 import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.EASY;
 import static com.kiruu.chess.player.types.AIPlayer.DIFFICULTY.HARD;
 
