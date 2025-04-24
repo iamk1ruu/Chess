@@ -25,15 +25,15 @@ public class AIPlayer extends Player {
 
     // ==== IMPLEMENT LATER =========
     @Override
-    public Move makeMove(Board board) throws IOException {
+    public Move makeMove(String fen) throws IOException {
         StockfishClient stockfish = new StockfishClient();
         if (stockfish.startEngine("stockfish/stockfish.exe")) {
-            String fen = FENParser.encode(board);
-            System.out.println(fen);
             String bestMove = stockfish.getBestMove(fen, 500);  // 500ms to decide
             stockfish.stopEngine();
             return MoveParser.parseMove(bestMove);
         }
         return null;
     }
+
+
 }

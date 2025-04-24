@@ -1,6 +1,7 @@
 package com.kiruu.chess.model;
 
 import com.kiruu.chess.player.types.AIPlayer;
+import com.kiruu.chess.util.FENParser;
 import com.kiruu.chess.util.Move;
 import com.kiruu.chess.util.Position;
 import com.kiruu.chess.player.Player;
@@ -78,9 +79,13 @@ public class GameManager {
             // Only switch turn if promotion isn't happening
             if (state != WHITE_PROMOTION && state != BLACK_PROMOTION) {
                 switchTurn();
+
                 if (blackPlayer instanceof AIPlayer) {
-                    board.move(blackPlayer.makeMove(board));
+                    String fenString = FENParser.encode(board);
+                    System.out.println(fenString);
+                    board.move(blackPlayer.makeMove(fenString));
                 }
+
                 System.out.println("[DEBUG] Switched Turn");
             } else {
                 System.out.println("[DEBUG] Promotion pending, turn not switched yet");

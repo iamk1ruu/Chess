@@ -17,5 +17,5 @@ public abstract class Player {
     }
     public String getName() {return name;}
     public Color getColor() {return color;}
-    public abstract Move makeMove(Board board) throws IOException;
+    public abstract Move makeMove(String fen) throws IOException;
 }

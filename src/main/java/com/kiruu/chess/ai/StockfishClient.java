@@ -44,6 +44,7 @@ public class StockfishClient {
     public String getBestMove(String fen, int timeLimitMillis) throws IOException {
         sendCommand("uci");
         sendCommand("isready");
+        System.err.println("[DEBUG] Sent command to StockFish");
         getOutput(100);  // Wait for "readyok"
         sendCommand("position fen " + fen);
         sendCommand("go movetime " + timeLimitMillis);
