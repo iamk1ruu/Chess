@@ -12,9 +12,16 @@
 * Added temporary turn-checking failsafes
 * Added Check, and Checkmate
 * Added temporary Game Over functions
-![Sample Screenshot](about/sample_screenshot.png)
-
+### April 21
+* Figured out how to integrate Stockfish
+### April 22-23
+* Created Stockfish Base Client Class
+* Modified the AIPlayer class
+### April 24
+* Figuring out how to integrate Firebase Realtime Database
 ## 📌 Overview
+![Sample Screenshot](about/sample_screenshot.png)
+![](about/currentprogress.png)
 
 This project is a full-featured chess game built in Java using JavaFX. It will include:
 
