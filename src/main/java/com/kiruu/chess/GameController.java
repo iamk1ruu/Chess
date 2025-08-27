@@ -135,6 +135,7 @@ public class GameController {
     }
 
     public void populateButtonMatrix() {
+        // could be better if you store each button in a list/array and iterate for each one instead of hardcoding each
         buttons[0][0] = a8;
         buttons[0][1] = b8;
         buttons[0][2] = c8;
@@ -336,13 +337,12 @@ public class GameController {
     }
 
     public void handleClick(ActionEvent e) {
-        // If promotion pane is visible, ignore board clicks
         if (promotionPane != null && promotionPane.isVisible()) {
             return;
         }
-
         String getFXID = ((Node) e.getSource()).getId();
-
+        // nested code in same if/else statements, while having the same functionality
+        // !! rewrite this switch statement
         switch (GAMEMODE) {
             case -1:
                 if (!isClickedOnce) {
